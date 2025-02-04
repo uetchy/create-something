@@ -63,7 +63,7 @@ export interface Options {
 
   /** Default value for package manager (default: `undefined`)
    *
-   * `npm`, `yarn` and `pnpm` are available. `undefined` to auto detect package manager. */
+   * `npm`, `yarn`, `pnpm` and `bun` are available. `undefined` to auto detect package manager. */
   defaultPackageManager?: PackageManager;
 
   /** Interactively asks users for a description */
@@ -312,7 +312,7 @@ export async function create(appName: string, options: Options) {
     'node-pm': {
       type: 'list',
       describe: 'Package manager to use for installing packages from npm',
-      choices: ['npm', 'yarn', 'pnpm'],
+      choices: ['npm', 'yarn', 'pnpm', 'bun'],
       default: defaultPackageManager, // undefined by default, we'll try to guess pm later
       prompt: promptForPackageManager ? 'if-no-arg' : 'never',
     },

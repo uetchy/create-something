@@ -1,7 +1,7 @@
 import { CLIError, printCommand } from '.';
 import { spawnPromise } from './fs';
 
-export type PackageManager = 'npm' | 'yarn' | 'pnpm';
+export type PackageManager = 'npm' | 'yarn' | 'pnpm' | 'bun';
 
 // License for `whichPm`
 // The MIT License (MIT)
@@ -27,27 +27,23 @@ export async function initPackage(
     pm: PackageManager;
   }
 ) {
-  let command: string;
+  const command: string = pm === 'yarn' ? 'yarnpkg' : pm;
   let args: string[];
 
   switch (pm) {
-    case 'npm': {
-      command = 'npm';
+    case 'npm':
+    case 'pnpm':
+    case 'bun': {
       args = ['init', '-y'];
       process.chdir(rootDir);
       break;
     }
     case 'yarn': {
-      command = 'yarnpkg';
       args = ['init', '-y', '--cwd', rootDir];
       break;
     }
-    case 'pnpm': {
-      command = 'pnpm';
-      args = ['init', '-y'];
-      process.chdir(rootDir);
-      break;
-    }
+    default:
+      throw new CLIError(`Unsupported package manager: ${pm}`);
   }
 
   printCommand(command, ...args);
@@ -60,26 +56,26 @@ export async function initPackage(
 }
 
 export async function installDeps(rootDir: string, pm: PackageManager) {
-  let command: string;
+  const command: string = pm === 'yarn' ? 'yarnpkg' : pm;
   let args: string[];
 
   switch (pm) {
-    case 'npm': {
-      command = 'npm';
+    case 'npm':
+    case 'bun': {
       args = ['install'];
       process.chdir(rootDir);
       break;
     }
     case 'yarn': {
-      command = 'yarnpkg';
       args = ['install', '--cwd', rootDir];
       break;
     }
     case 'pnpm': {
-      command = 'pnpm';
       args = ['install', '--dir', rootDir];
       break;
     }
+    default:
+      throw new CLIError(`Unsupported package manager: ${pm}`);
   }
 
   printCommand(command, ...args);
@@ -102,26 +98,26 @@ export async function addDeps(
     pm: PackageManager;
   }
 ) {
-  let command: string;
+  const command: string = pm === 'yarn' ? 'yarnpkg' : pm;
   let args: string[];
 
   switch (pm) {
     case 'npm': {
-      command = 'npm';
       args = ['install', isDev ? '-D' : '-S', ...deps];
       process.chdir(rootDir);
       break;
     }
-    case 'yarn': {
-      command = 'yarnpkg';
+    case 'yarn':
+    case 'bun': {
       args = ['add', '--cwd', rootDir, ...deps, isDev ? '-D' : ''];
       break;
     }
     case 'pnpm': {
-      command = 'pnpm';
       args = ['add', '--dir', rootDir, ...deps, isDev ? '-D' : ''];
       break;
     }
+    default:
+      throw new CLIError(`Unsupported package manager: ${pm}`);
   }
 
   printCommand(command, ...args);
